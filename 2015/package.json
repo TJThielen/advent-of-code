@@ -1,5 +1,5 @@
 {
-  "name": "2025-advent-of-code",
+  "name": "2015-advent-of-code",
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
@@ -8,5 +8,8 @@
   },
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "crypto": "^1.0.1"
+  }
 }
