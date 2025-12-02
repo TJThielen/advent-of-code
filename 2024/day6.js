@@ -1,108 +1,135 @@
-import fs from 'fs';
+import fs from 'fs'
 
-const input = fs.readFileSync('./day6Input.txt', 'utf8');
-const map = input.split('\n');
-// const x = 6;
-// const y = 4;
-const x = 69;
-const y = 74;
+var input = fs.readFileSync('./2024AdventOfCodeDay6Input.txt').toString();
+//input = fs.readFileSync('./testInput.txt').toString();
+const rows = input.split('\n');
+let x = -1;
+let y = -1;
+let map = [];
+let xys = [];
+let xys2 = [];
 
+for(const row in rows){
+    let arr = [];
+    for(const char in rows[row]){
+        arr.push(rows[row][char]);
+        if(rows[row][char] == '^'){
+            x = row;
+            y = char;
+        }
+    }
+    map.push(arr);
+}
+
+let ogMap = copy(map);
+ogMap[47][74] = '#';
+isLoop(ogMap,x, y, 47, 74, xys);
 let counter = 0;
-for(let i = 0; i < 130; i++){
-    for(let j = 0; j < 130; j++){
-        let newMap = map.slice();
-        newMap[i] = map[i].slice(0, j) + '#' + map[i].slice(j+1);
-        if(isLoop(newMap, x, y, 0)){
+for(const row in ogMap){
+    for(const char in ogMap[row]){
+        if(Number.isInteger(ogMap[row][char]) && row != 69 && char != 74){
+            let newMap = copy(map);
+            newMap[row][char] = '#';
+            if(isLoop(newMap, x, y, row, char, xys)){
+                counter++;
+            }
+        }
+    }
+}
+
+for(const row in ogMap){
+    for(const char in ogMap[row]){
+        let newMap = copy(map);
+        newMap[row][char] = '#';
+        if(isLoop(newMap, x, y, row, char, xys2)){
             counter++;
         }
     }
 }
+
+let b = [];
+xys2.forEach(a => {
+    if(!xys.includes(a)) {
+        b.push(a);
+    }
+})
+
 console.log(counter);
 
-
-function isLoop(map, x, y, dir){
-    while(true){
-        if(x < 0 || x >= 130 || y < 0 || y >= map[0].length){
-            return false;
-        }
-        const num = Number(map[x][y])
-        if(Number.isInteger(num)){
-            if(num > 4){
-                return true;
-            }
-            map[x] = map[x].slice(0, y) + `${parseInt(map[x][y]) + 1}` + map[x].slice(y+1);
-        } else {
-            map[x] = map[x].slice(0, y) + '1' + map[x].slice(y+1);
-        }
-
-        if(dir == 0){
-            if(x-1 > -1){
-                if(map[x-1][y] == '#'){
-                    if(map[x][y+1] != '#'){
-                        dir = 1;
-                        y++;
-                    } else {
-                        dir = 2;
-                        x++;
-                    }
-                } else {
-                    x--;
-                }
-            } else {
-                x--;
-            }
-        }
-        else if(dir == 1){
-            if(y+1 < 130){
-                if(map[x][y+1] == '#'){
-                    if(map[x+1][y] != '#'){
-                        x++;
-                        dir = 2;
-                    } else {
-                        y--;
-                        dir = 3;
-                    }
-                } else {
-                    y++;
-                }
-            } else {
-                y++;
-            }
-        }
-        else if(dir == 2){
-            if(x + 1 < 130){
-                if(map[x+1][y] == '#'){
-                    if(map[x][y-1] != '#'){
-                        y--;
-                        dir = 3
-                    } else {
-                        x--;
-                        dir = 0;
-                    }
-
-                } else {
-                    x++;
-                }
-            } else {
-                x++
-            }
-        }
-        else if(dir == 3){
-            if(y > 0){
-                if(map[x][y-1] == '#'){
-                    if(map[x-1][y] != '#'){
-                        x--;
-                        dir = 0;
-                    } else {
-                        dir = 1;
-                        y++;
-                    }
-                } else {
-                    y--;
-                }
-            } else {
-                y--;
-            }
-        }
+function copy(map){
+    let newMap = [];
+    for(const row in map){
+        newMap.push(map[row].slice());
     }
+    return newMap;
 }
+
+function isLoop(map, x, y, row, char, xys) {
+    let turns = 0;
+    let inBounds = true;
+    while(inBounds) {
+        if(Number.isInteger(map[x][y])){
+            map[x][y]++;
+            if(map[x][y] > 4){
+                xys.push(`${row} ${char}`)
+                //return true;
+            }
+        } else{
+            map[x][y] = 1;
+        }
+    
+        switch(turns % 4){
+            case 0:
+                if(x != 0){
+                    if(map[x-1][y] == '#') {
+                        turns++;
+                        y++;
+                    } else {
+                        x--;
+                    }
+                } else {
+                    inBounds = false;
+                }
+                break;
+            case 1: 
+                if(y != map[0].length-1){
+                    if(map[x][y+1] == '#') {
+                        turns++;
+                        x++;
+                    } else {
+                        y++;
+                    }
+                } else {
+                    inBounds = false;
+                }
+                break;
+            case 2:
+                if(x != map.length-1){
+                    if(map[x+1][y] == '#') {
+                        turns++;
+                        y--;
+                    } else {
+                        x++;
+                    }
+                } else {
+                    inBounds = false;
+                }
+                break;
+            case 3:
+                if(y != 0){
+                    if(map[x][y-1] == '#') {
+                        turns++;
+                        x--;
+                    } else {
+                        y--;
+                    }
+                } else {
+                    inBounds = false;
+                }
+                break;
+        }
+    }    
+    return false;
+}
+
+
