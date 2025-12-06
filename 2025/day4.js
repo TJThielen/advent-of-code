@@ -1,5 +1,3 @@
-//I know this ones really sloppy but I went for pure speed and don't feel like refactoring right now
-
 import {readFile} from 'fs/promises';
 
 const content = await readFile('./day4.txt', 'utf8');
@@ -47,7 +45,9 @@ function p1(){
 function p2(){
     let grid = lines;
     let totalRemoved = 0;
-    while(true){
+    let tempRemoved = 1;
+    while(tempRemoved != 0){
+        tempRemoved = 0;
         let newGrid = [];
         for(let i = 0; i < lines.length; i++){
             const arr = [];
@@ -56,6 +56,7 @@ function p2(){
                 if(neighbors < 4 && grid[i][j] == '@') {
                     arr.push('.')
                     totalRemoved++;
+                    tempRemoved++;
                 } else {
                     arr.push(grid[i][j]);
                 }
@@ -64,6 +65,7 @@ function p2(){
         }
         grid = newGrid;
     }
+    console.log(totalRemoved);
 }
 
 p2();
