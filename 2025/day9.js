@@ -92,6 +92,3 @@ function isGreen(area){
 }
 
 p2();
-
-
-//lower than 4661665300, 4661665300
